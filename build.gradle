@@ -1,0 +1,65 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "0.1"
+group= "com.headlamp-games"
+archivesBaseName = "SpongeOnRails"
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}
+
+minecraft {
+    version = project.forge_version
+    runDir = "run"
+    mappings = project.mappings
+}
+
+repositories {
+    ivy {
+        name = "Railcraft"
+        url = "http://www.railcraft.info/ivy/"
+    }
+}
+
+dependencies {
+    compile "org.spongepowered:spongeforge:${sponge_version}:dev"
+    deobfCompile("com.headlamp-games:Railcraft:${railcraft_version}") {
+        exclude module: "forestry_1.10.2"
+        exclude module: "industrialcraft-2"
+    }
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
