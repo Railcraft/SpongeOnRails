@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.4.12",
+  "package": "mods.railcraft.sponge.mixin.core",
+  "refmap": "mixins.forge.refmap.json",
+  "priority": 1111,
+  "mixins": [
+    "MixinRailcraftCarts"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

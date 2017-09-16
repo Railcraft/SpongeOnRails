@@ -4,33 +4,47 @@ buildscript {
         maven {
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            url = "http://repo.spongepowered.org/maven/"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+        classpath 'org.spongepowered:spongegradle:0.5-SNAPSHOT'
     }
 }
 
+plugins {
+    id 'net.minecrell.licenser' version '0.3'
+    id "com.github.johnrengelman.shadow" version "2.0.1"
+    id "ninja.miserable.blossom" version "1.0.1"
+}
+
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.spongepowered.gradle'
+apply plugin: 'org.spongepowered.plugin'
 
 version = "0.1"
-group= "com.headlamp-games"
+group = "com.headlamp-games"
 archivesBaseName = "SpongeOnRails"
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-compileJava {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-}
+//defaultTasks 'licenseFormat', 'sortAccessTransformers', 'build'
 
-minecraft {
-    version = project.forge_version
-    runDir = "run"
-    mappings = project.mappings
+configurations {
+    spongeforge
+    compile.extendsFrom spongeforge
 }
 
 repositories {
+    maven {
+        name = "Sponge"
+        url = "http://repo.spongepowered.org/maven/"
+    }
     ivy {
         name = "Railcraft"
         url = "http://www.railcraft.info/ivy/"
@@ -38,14 +52,72 @@ repositories {
 }
 
 dependencies {
-    compile "org.spongepowered:spongeforge:${sponge_version}:dev"
+    spongeforge "org.spongepowered:spongeforge:${sponge_version}:dev"
+    compile "org.spongepowered:mixin:0.7.3-SNAPSHOT"
     deobfCompile("com.headlamp-games:Railcraft:${railcraft_version}") {
         exclude module: "forestry_1.10.2"
         exclude module: "industrialcraft-2"
     }
 }
 
+deobfMcMCP.failOnAtError = false
+deobfMcSRG.failOnAtError = false
+
+compileJava {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.compilerArgs += [
+            '-Xlint:-processing',
+    ]
+    options.deprecation = true
+    options.encoding = 'utf8'
+}
+
+jar {
+    classifier = "raw"
+    manifest {
+        attributes(
+                'FMLCorePlugin': 'mods.railcraft.sponge.SpongeOnRailsLoadingPlugin',
+                'ForceLoadAsMod': 'true',
+                'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+                'TweakOrder': 0,
+                'FMLAT': 'spongeonrails_at.cfg'
+        )
+    }
+}
+
+minecraft {
+    version = project.forge_version
+    runDir = "run"
+    mappings = project.mappings
+    makeObfSourceJar = false
+}
+
+sourceSets.main.refMap = "mixins.${project.name}.refmap.json"
+
+mixin.importConfig configurations.spongeforge
+
+sponge.plugin {
+    id = project.name
+    version = project.version
+    description = "A Mod bringing compatibility between the Railcraft Mod and the Sponge API."
+}
+
+blossom {
+    def modFile = 'src/main/java/mods/railcraft/sponge/SpongeOnRails.java'
+    replaceToken '%VERSION%', project.version, modFile
+}
+
+license {
+    header rootProject.file('LICENSE.txt')
+    include '**/*.java'
+    newLine = false
+    style.java = 'BLOCK_COMMENT'
+}
+
 processResources {
+    from 'LICENSE.txt'
+
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -53,11 +125,11 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
