@@ -52,6 +52,7 @@ repositories {
 }
 
 dependencies {
+    compile project("api")
     spongeforge "org.spongepowered:spongeforge:${sponge_version}:dev"
     compile "org.spongepowered:mixin:0.7.3-SNAPSHOT"
     deobfCompile("com.headlamp-games:Railcraft:${railcraft_version}") {
@@ -93,7 +94,7 @@ minecraft {
     makeObfSourceJar = false
 }
 
-sourceSets.main.refMap = "mixins.${project.name}.refmap.json"
+sourceSets.main.ext.refMap = "mixins.${project.name}.refmap.json"
 
 mixin.importConfig configurations.spongeforge
 
@@ -103,10 +104,7 @@ sponge.plugin {
     description = "A Mod bringing compatibility between the Railcraft Mod and the Sponge API."
 }
 
-blossom {
-    def modFile = 'src/main/java/mods/railcraft/sponge/SpongeOnRails.java'
-    replaceToken '%VERSION%', project.version, modFile
-}
+blossom.replaceToken '%VERSION%', project.version, 'src/main/java/mods/railcraft/sponge/SpongeOnRails.java'
 
 license {
     header rootProject.file('LICENSE.txt')

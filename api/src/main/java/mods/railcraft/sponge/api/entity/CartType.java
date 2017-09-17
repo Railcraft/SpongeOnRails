@@ -22,13 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package mods.railcraft.sponge.api;
+package mods.railcraft.sponge.api.entity;
 
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.util.annotation.CatalogedBy;
 
 /**
  *
  */
+@CatalogedBy(CartTypes.class)
 public interface CartType extends EntityType {
 
 }

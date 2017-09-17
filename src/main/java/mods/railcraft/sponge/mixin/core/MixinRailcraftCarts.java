@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 
 import mods.railcraft.common.carts.RailcraftCarts;
 import mods.railcraft.common.core.IRailcraftObjectContainer;
-import mods.railcraft.sponge.api.CartType;
+import mods.railcraft.sponge.api.entity.CartType;
 
 /**
  *

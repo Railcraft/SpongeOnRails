@@ -1,0 +1,30 @@
+group = pluginGroup
+version = pluginVersion
+
+apply plugin: "java" // Gradle is dumper than you think!
+
+repositories {
+    maven {
+        name = "Sponge"
+        url = "http://repo.spongepowered.org/maven/"
+    }
+    ivy {
+        name = "Railcraft"
+        url = "http://www.railcraft.info/ivy/"
+    }
+}
+
+dependencies {
+    compile "org.spongepowered:spongeapi:5.+"
+}
+
+blossom.replaceToken '%VERSION%', project.version, 'src/main/java/mods/railcraft/sponge/api/SpongeOnRailsAPI.java'
+
+sponge.plugin.id = pluginId
+
+license {
+    header rootProject.file('LICENSE.txt')
+    include '**/*.java'
+    newLine = false
+    style.java = 'BLOCK_COMMENT'
+}
