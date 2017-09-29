@@ -25,6 +25,14 @@
 package mods.railcraft.sponge;
 
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.InstanceFactory;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+
+import org.spongepowered.api.Sponge;
+
+import mods.railcraft.sponge.api.entity.MinecartUtilImpl;
+import mods.railcraft.sponge.api.entity.MinecartUtils;
 
 /**
  *
@@ -39,10 +47,16 @@ public final class SpongeOnRails {
 
     private static final SpongeOnRails INSTANCE = new SpongeOnRails();
 
-    @Mod.InstanceFactory
+    @InstanceFactory
     public static SpongeOnRails getInstance() {
         return INSTANCE;
     }
 
-    private SpongeOnRails() {}
+    private SpongeOnRails() {
+    }
+
+    @EventHandler
+    public void onInit(FMLInitializationEvent event) {
+        Sponge.getServiceManager().setProvider(SpongeOnRails.getInstance(), MinecartUtils.class, new MinecartUtilImpl());
+    }
 }
